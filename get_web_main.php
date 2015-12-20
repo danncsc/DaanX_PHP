@@ -12,7 +12,7 @@ include的程式
 	$doc=phpQuery::newDocumentHTML($web_data);//將抓來的資料丟到phpQuery的code(第一階段)
 	$do_pq=pq('table[width="100%"]&&[align="center"]',$doc);//取得內容頁面並將不需要的程式碼刪除(第一階段)
 	$web_main_top_day=$do_pq->find('td[align="center"]&&[width="13%"]&&[bgcolor="#FF0000"]')->text();//日期
-	$web_main_top_title=$do_pq->find('td[align="left"]&&[width="87%"]&&[bgcolor="#FF0000"]')->text();//主題
+	$web_main_top_title=str_replace('"','\"',$do_pq->find('td[align="left"]&&[width="87%"]&&[bgcolor="#FF0000"]')->text());//主題
 	$web_main_data=iconv("big5","UTF-8",$do_pq->find('tr[bgcolor="#FFDDBB"]')->find('td[width="87%"]')->html());//內文
 	$web_main_where=$do_pq->find('tr[bgcolor="#FCEBC7"]')->find('td[width="87%"]')->text();//資料來源
 	$web_main_outside_link=$do_pq->find('tr[bgcolor="#FFFF00"]')->find('td[bgcolor="#FFFFCC"]&&[width="87%"]')->find('a')->html();//參考連結

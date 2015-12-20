@@ -4,8 +4,8 @@
 Daan-X的主程式
 ==========================*/
 	$time_start = microtime(true);
-	$mysql_sign=mysql_connect("localhost","1234","1234","myDB");//登入SQL
-	$mysql_check=mysql_select_db("Daan-X",$mysql_sign);//選擇資料厙
+	$mysql_sign=mysql_connect("localhost","DaanX","ffMmQ2Nze2VNsHEn");//登入SQL
+	$mysql_check=mysql_select_db("DaanX",$mysql_sign);//選擇資料厙
 	mysql_query("SET NAMES utf8");//資料庫編碼設定
 	include"phpQuery-onefile.php";//引入phpQuery的code
 	include"get_web_last.php";//引入資料表"紀錄的陣列變數"
