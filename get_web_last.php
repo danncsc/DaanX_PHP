@@ -7,6 +7,7 @@ include的程式
 	$read_data=0;//設定記數初始值
 	$read_SQL=mysql_query("SELECT * FROM stu_sgin");//尋找資料表
 	$row_id_01 = mysql_fetch_row($read_SQL);//搜索列
+	echo "上次的最後資料:".$row_id_01[0]."\n";
 	$number=$row_id_01[0]+1;//取得第一個列的值（id）即上次搜索到的最終資料+1
 	$array_unmber="";//設定紀錄用的陣列變數
 		for ($i=$number; $i <$number+20 ; $i++) { //將＄i設為上次搜索到的最終資料 並以每二十個資料為一循環
@@ -22,13 +23,16 @@ include的程式
 			}
 
 		}
+	echo "已取得最新ID"."\n";
 	if($array_unmber !=""){//當$array_unmber存在時
 		$last_number=max($array_unmber);//將陣列中最大值取出
 		mysql_query(" UPDATE stu_sgin SET id='$last_number'") ;//寫回SQL
+		echo "本次搜尋的最後資料:".$last_number."\n";
 		$read_data=1;
 	}
 	else{
 		$read_data=0;
+		echo "本次搜尋的最後資料:".$row_id_01[0]."\n";
 	}
 	
 ?>
