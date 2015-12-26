@@ -12,7 +12,7 @@ include的程式
 	$doc=phpQuery::newDocumentHTML($web_data);//將抓來的資料丟到phpQuery的code(第一階段)
 	$do_pq=pq('table[width="100%"]&&[align="center"]',$doc);//取得內容頁面並將不需要的程式碼刪除(第一階段)
 	$web_main_top_day=$do_pq->find('td[align="center"]&&[width="13%"]&&[bgcolor="#FF0000"]')->text();//日期
-	$web_main_top_title=$do_pq->find('td[align="left"]&&[width="87%"]&&[bgcolor="#FF0000"]')->text();//主題
+	$web_main_top_title=str_replace('"','\"',$do_pq->find('td[align="left"]&&[width="87%"]&&[bgcolor="#FF0000"]')->text());//主題
 	$web_main_data=iconv("big5","UTF-8",$do_pq->find('tr[bgcolor="#FFDDBB"]')->find('td[width="87%"]')->html());//內文
 	$web_main_where=$do_pq->find('tr[bgcolor="#FCEBC7"]')->find('td[width="87%"]')->text();//資料來源
 	$web_main_outside_link=$do_pq->find('tr[bgcolor="#FFFF00"]')->find('td[bgcolor="#FFFFCC"]&&[width="87%"]')->find('a')->html();//參考連結
@@ -25,16 +25,17 @@ include的程式
 		}
 	$web_main_link_sum="";//初始變數
 	$web_main_link="";//初始變數
-	$web_main_link_from=explode("<br>", iconv("big5","UTF-8",$do_pq->find('td[colspan=2]')->html()));//附件的原始資料（陣列）
-		for ($m=0; $m <count($web_main_link_from) ; $m++) { //一陣列數來判斷要抓多少程式
+	$web_main_link_from=explode("<br>", iconv("big5","UTF-8",$do_pq->find('td[colspan=2]')->html()));//附件的原始資料html（陣列）
+	$web_main_link_text=explode("\n",$do_pq->find('td[colspan=2]')->find('a')->text());//附件的原始資料text（陣列）
+		for ($m=1; $m <count($web_main_link_from) ; $m++) { //一陣列數來判斷要抓多少程式
 			$Address_frist02=strpos($web_main_link_from[$m],"href=",0);//抓字首
 			$Address_end02=strpos($web_main_link_from[$m]," target",0);//抓字尾
 			$Address_long02=$Address_end02-$Address_frist02;//抓字首和字尾的差;
 			$web_main_link_output=substr($web_main_link_from[$m],$Address_frist02+6,$Address_long02-7);//抓超連結文字
-			$web_main_link_sum[]="http://ta.taivs.tp.edu.tw/news/$web_main_link_output"."|||";//附件轉成一陣列
+			$web_main_link_sum[]=$web_main_link_text[$m-1]."///"."http://ta.taivs.tp.edu.tw/news/$web_main_link_output"."|||";//附件轉成一陣列
 		}
-		if (count($web_main_link_sum)>1) {//分析陣列
-			for ($x=1; $x < count($web_main_link_sum); $x++) {//忽略第一個空值
+		if ($web_main_link_text[0] !="") {//分析陣列
+			for ($x=0; $x < count($web_main_link_sum); $x++) {//忽略第一個空值
 				$web_main_link=$web_main_link.$web_main_link_sum[$x];//輸出切割網址
 			}
 		}
@@ -67,23 +68,26 @@ include的程式
 		curl_setopt($ch_stu_text, CURLOPT_RETURNTRANSFER, true);//顯示頭信息？(第二階段)
 		$web_stu_text_data=curl_exec($ch_stu_text);//取網頁原始碼(第二階段)
 		$stu_text_doc=phpQuery::newDocumentHTML($web_stu_text_data);//將抓來的資料丟到phpQuery的code(第二階段)
-		$cut_stu_text=explode("\n", pq('table[border="1"]',$stu_text_doc)->find('tr[bgcolor]')->find('a')->text());//取得標題的文字
+		$cut_stu_text=explode("\n", str_replace('"','\"', pq('table[border="1"]',$stu_text_doc)->find('tr[bgcolor]')->find('a')->text()));//取得標題的文字
 			for ($o=0; $o<count($cut_stu_text) ; $o++) { //搜尋該頁面資料數以執行迴圈
-					if ($n<2&&substr($web_main_top_title,4,40)==substr($cut_stu_text[$o],0,40)) {//當資料內容相同且對應輸出資料庫的網頁陣列數＄n＝0,1
+				$caseA=substr($web_main_top_title,4,40);
+				$caseB=substr($cut_stu_text[$o],0,40);
+					if ($n<2&&$caseA==$caseB) {//當資料內容相同且對應輸出資料庫的網頁陣列數＄n＝0,1
 						mysql_query("INSERT INTO stu_main_stu_affairs (web_id,web_main_top_day,web_main_top_title,web_main_data,web_main_where,web_main_outside_link,web_main_can_read_time,web_main_link,web_main_file) VALUES ('$array_unmber[$A]','$web_main_top_day','$web_main_top_title','$web_main_data','$web_main_where','$web_main_outside_link','$web_main_can_read_time','$web_main_link','$web_main_file') ") ;//寫入資料庫
 					}
-					else if ($n<4&&substr($web_main_top_title,4,40)==substr($cut_stu_text[$o],0,40)) {//當資料內容相同且對應輸出資料庫的網頁陣列數＄n＝2,3
+					else if ($n<4&&$caseA==$caseB) {//當資料內容相同且對應輸出資料庫的網頁陣列數＄n＝2,3
 						mysql_query("INSERT INTO stu_main_stu_race (web_id,web_main_top_day,web_main_top_title,web_main_data,web_main_where,web_main_outside_link,web_main_can_read_time,web_main_link,web_main_file) VALUES ('$array_unmber[$A]','$web_main_top_day','$web_main_top_title','$web_main_data','$web_main_where','$web_main_outside_link','$web_main_can_read_time','$web_main_link','$web_main_file') ") ;//寫入資料庫
 					}
-					else if($n<6&&substr($web_main_top_title,4,40)==substr($cut_stu_text[$o],0,40)) {//當資料內容相同且對應輸出資料庫的網頁陣列數＄n＝4,5
+					else if($n<6&&$caseA==$caseB) {//當資料內容相同且對應輸出資料庫的網頁陣列數＄n＝4,5
 						mysql_query("INSERT INTO stu_main_stu_help (web_id,web_main_top_day,web_main_top_title,web_main_data,web_main_where,web_main_outside_link,web_main_can_read_time,web_main_link,web_main_file) VALUES ('$array_unmber[$A]','$web_main_top_day','$web_main_top_title','$web_main_data','$web_main_where','$web_main_outside_link','$web_main_can_read_time','$web_main_link','$web_main_file') ") ;//寫入資料庫
 					}
-					else if ($n==6&&substr($web_main_top_title,4,40)==substr($cut_stu_text[$o],0,40)) {//當資料內容相同且對應輸出資料庫的網頁陣列數＄n＝7
+					else if ($n==6&&$caseA==$caseB) {//當資料內容相同且對應輸出資料庫的網頁陣列數＄n＝7
 						mysql_query("INSERT INTO stu_main_this_term (web_id,web_main_top_day,web_main_top_title,web_main_data,web_main_where,web_main_outside_link,web_main_can_read_time,web_main_link,web_main_file) VALUES ('$array_unmber[$A]','$web_main_top_day','$web_main_top_title','$web_main_data','$web_main_where','$web_main_outside_link','$web_main_can_read_time','$web_main_link','$web_main_file') ") ;//寫入資料庫
 					}
 			}
 	curl_close($ch_stu_text);//結束php_curl
 	}
 	mysql_query("INSERT INTO stu_main_this_week (web_id,web_main_top_day,web_main_top_title,web_main_data,web_main_where,web_main_outside_link,web_main_can_read_time,web_main_link,web_main_file) VALUES ('$array_unmber[$A]','$web_main_top_day','$web_main_top_title','$web_main_data','$web_main_where','$web_main_outside_link','$web_main_can_read_time','$web_main_link','$web_main_file') ") ;//寫入資料庫（總數據）
+	echo  "第".$A."筆資料庫寫入完成"."\n";
 	curl_close($ch);//結束php_curl(第一階段)
 ?>
