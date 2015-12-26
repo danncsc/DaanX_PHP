@@ -53,7 +53,7 @@ include的程式
 	$web_main_file_check_output=substr($web_main_file_from,$Address_end,3);//抓末三字
 	$web_main_file_output=substr($web_main_file_from,$Address_frist+10,$Address_long-7);//抓超連結文字
 		if($web_main_file_check_output =="jpg"||$web_main_file_check_output =="gif"||$web_main_file_check_output =="png"||$web_main_file_check_output =="jpeg"||$web_main_file_check_output =="bmp"){//當末三字是jpg時（我還沒看過學校資料上有png或gif的文章附件）
-			$web_main_file="http://ta.taivs.tp.edu.tw/news/$web_main_file_output";//圖片輸出
+			$web_main_file=str_replace('"','',"http://ta.taivs.tp.edu.tw/news/$web_main_file_output");//圖片輸出
 		}
 /*=========================
 本程式已完成
