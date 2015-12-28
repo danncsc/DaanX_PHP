@@ -61,7 +61,6 @@ include的程式
 include的程式
 第二階段的程式
 ==========================*/
-	
 		$http=urlencode(iconv("UTF-8","Big5",trim($serach)));//先轉big5再轉url
 		$ch_stu_text=curl_init();//curl宣告(第二階段)
 		curl_setopt($ch_stu_text, CURLOPT_URL,"http://ta.taivs.tp.edu.tw/news/news.asp?SearchWay=no0&board=1&SearchWord=$http");//網頁來源宣告(第二階段)
