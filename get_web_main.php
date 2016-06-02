@@ -5,17 +5,25 @@ include的程式
 第一階段的程式
 ==========================*/
 	$ch=curl_init();//curl宣告(第一階段)
-	curl_setopt($ch, CURLOPT_URL,"http://ta.taivs.tp.edu.tw/news/news.asp?KEY=$array_unmber[$A]");//網頁來源宣告(第一階段)
+	curl_setopt($ch, CURLOPT_URL,"http://ta.taivs.tp.edu.tw/news/news.asp?PageNo=1&board=1&KEY=$array_unmber[$A]");//網頁來源宣告(第一階段)
 	curl_setopt($ch, CURLOPT_HEADER, false);//頁面標籤顯示(第一階段)
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);//顯示頭信息？(第一階段)
 	$web_data=curl_exec($ch);//取網頁原始碼(第一階段)
 	$doc=phpQuery::newDocumentHTML($web_data);//將抓來的資料丟到phpQuery的code(第一階段)
 	$do_pq=pq('table[width="100%"]&&[align="center"]',$doc);//取得內容頁面並將不需要的程式碼刪除(第一階段)
 	$web_main_top_day=$do_pq->find('td[align="center"]&&[width="13%"]&&[bgcolor="#FF0000"]')->text();//日期
-	$web_main_top_title=str_replace('"','\"',$do_pq->find('td[align="left"]&&[width="87%"]&&[bgcolor="#FF0000"]')->text());//主題
+	    if($web_main_top_day ==""){
+            $web_mian_top_day="日期錯誤";
+            echo "有公告日期錯誤";
+        }
+    $web_main_top_title=str_replace('"','\"',$do_pq->find('td[align="left"]&&[width="87%"]&&[bgcolor="#FF0000"]')->text());//主題
 	$serach=$do_pq->find('td[align="left"]&&[width="87%"]&&[bgcolor="#FF0000"]')->text();//搜尋資料用
 	$web_main_data=iconv("big5","UTF-8",$do_pq->find('tr[bgcolor="#FFDDBB"]')->find('td[width="87%"]')->html());//內文
 	$web_main_where=$do_pq->find('tr[bgcolor="#FCEBC7"]')->find('td[width="87%"]')->text();//資料來源
+        if($web_main_where ==""){
+            $web_main_where="？未知來源";
+            echo "有未知來源公告";
+        }
 	$web_main_outside_link=$do_pq->find('tr[bgcolor="#FFFF00"]')->find('td[bgcolor="#FFFFCC"]&&[width="87%"]')->find('a')->html();//參考連結
 		if($web_main_outside_link !==""){//當參考連結存在（剛好會和有效日期疊到）時
 			$web_main_can_read_time_form=explode("\n"."            ", $do_pq->find('tr')->find('td[bgcolor="#FFFFCC"]&&[width="87%"]')->text());//切割收到的資料（因為後另一資料抓法會重疊到）
