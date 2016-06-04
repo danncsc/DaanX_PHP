@@ -4,10 +4,9 @@
 Daan-X的主程式
 ==========================*/
 	$time_start_all = microtime(true);
-	$mysql_sign=mysql_connect("localhost","DaanX","1234");//登入SQL(請改密碼)
+	$mysql_sign=mysql_connect("localhost","DaanX","1234");//登入SQL(請改密碼!!!!!!!!!!)
 	$mysql_check=mysql_select_db("DaanX",$mysql_sign);//選擇資料厙
 	mysql_query("SET NAMES utf8");//資料庫編碼設定
-    echo "已登入資料庫.\n";
 	include"phpQuery-onefile.php";//引入phpQuery的code
 	$time_start_id= microtime(true);
 	include"get_web_last.php";//引入資料表"紀錄的陣列變數"
